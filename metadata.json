@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Media Studio",
+  "description": "A powerful application to analyze, edit, generate, and animate media using Google's Gemini, Imagen, and Veo models. Create marketing content from product photos, generate new images from text, apply AI edits, and bring photos to life with video animation.",
+  "requestFramePermissions": []
+}

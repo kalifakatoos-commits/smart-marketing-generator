@@ -1,0 +1,239 @@
+<div class="max-w-4xl mx-auto">
+  <div class="bg-gray-800 p-8 rounded-lg shadow-2xl">
+    <h2 class="text-3xl font-bold mb-2 text-center">تحليل صورة المنتج وإنشاء محتوى</h2>
+    <p class="text-center text-gray-400 mb-6">قم بتحميل صورة منتج لإنشاء اسم ومنشور تسويقي ومميزات وهاشتاقات وموجه جديد
+      لإنشاء صورة تلقائيًا.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Left Column: Input -->
+      <div class="space-y-6">
+        <div>
+          <label for="image-upload" class="block text-sm font-medium text-gray-300 mb-2">١. تحميل الصورة</label>
+          <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
+            <div class="space-y-1 text-center">
+              @if (imagePreview()) {
+              <img [src]="imagePreview()" alt="Image preview" class="mx-auto h-40 w-auto object-contain rounded-md" />
+              } @else {
+              <svg class="mx-auto h-12 w-12 text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48"
+                aria-hidden="true">
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              <p class="text-sm text-gray-400">اسحب وأفلت أو انقر للتحميل</p>
+              <p class="text-xs text-gray-500">PNG, JPG, GIF, WEBP</p>
+              }
+              <label for="image-upload"
+                class="relative cursor-pointer bg-gray-800 rounded-md font-medium text-blue-400 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-800 focus-within:ring-blue-500">
+                <span>تحميل ملف</span>
+                <input id="image-upload" name="image-upload" type="file" class="sr-only"
+                  (change)="onFileSelected($event)" accept="image/png,image/jpeg,image/gif,image/webp">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="webhook-url" class="block text-sm font-medium text-gray-300">٢. رابط Webhook (اختياري)</label>
+          <input type="url" name="webhook-url" id="webhook-url" (input)="onWebhookUrlChange($event)"
+            class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+            placeholder="https://your-endpoint.com/hook">
+        </div>
+
+        <!-- Template Customization -->
+        <div class="space-y-4">
+          <button (click)="toggleCustomizing()"
+            class="w-full text-sm text-blue-400 hover:text-blue-300 transition-colors">
+            {{ isCustomizing() ? 'إخفاء' : 'إظهار' }} تخصيص القالب
+          </button>
+
+          @if(isCustomizing()) {
+          <div class="bg-gray-700 p-4 rounded-lg space-y-4">
+            <h3 class="font-semibold text-center">تخصيص قالب المنشور</h3>
+            <!-- Font Family -->
+            <div>
+              <label class="text-xs font-medium">نوع الخط</label>
+              <select [value]="templateSettings().fontFamily"
+                (change)="updateTemplate('fontFamily', $any($event.target).value)"
+                class="mt-1 block w-full bg-gray-600 border-gray-500 rounded-md shadow-sm text-xs h-8">
+                @for(font of fonts; track font) {
+                <option [value]="font">{{font}}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Product Name -->
+            <div class="grid grid-cols-2 gap-2 items-center">
+              <label class="text-xs font-medium">اسم المنتج</label>
+              <div class="flex items-center gap-2">
+                <input type="color" [value]="templateSettings().productName.color"
+                  (input)="updateTemplate('productName', $any($event.target).value, 'color')"
+                  class="w-8 h-8 bg-transparent border-none cursor-pointer">
+                <label class="flex items-center gap-1 text-xs"><input type="checkbox"
+                    [checked]="templateSettings().productName.bold"
+                    (change)="updateTemplate('productName', $any($event.target).checked, 'bold')"> عريض</label>
+              </div>
+            </div>
+
+            <!-- Marketing Post -->
+            <div class="grid grid-cols-2 gap-2 items-center">
+              <label class="text-xs font-medium">المنشور التسويقي</label>
+              <div class="flex items-center gap-2">
+                <input type="color" [value]="templateSettings().marketingPost.color"
+                  (input)="updateTemplate('marketingPost', $any($event.target).value, 'color')"
+                  class="w-8 h-8 bg-transparent border-none cursor-pointer">
+                <label class="flex items-center gap-1 text-xs"><input type="checkbox"
+                    [checked]="templateSettings().marketingPost.italic"
+                    (change)="updateTemplate('marketingPost', $any($event.target).checked, 'italic')"> مائل</label>
+              </div>
+            </div>
+
+            <!-- Features -->
+            <div class="grid grid-cols-2 gap-2 items-center">
+              <label class="text-xs font-medium">لون المميزات</label>
+              <input type="color" [value]="templateSettings().features.color"
+                (input)="updateTemplate('features', $any($event.target).value, 'color')"
+                class="w-8 h-8 bg-transparent border-none cursor-pointer">
+            </div>
+
+            <!-- Hashtags -->
+            <div class="grid grid-cols-2 gap-2 items-center">
+              <label class="text-xs font-medium">الهاشتاقات</label>
+              <div class="flex items-center gap-2">
+                <input type="color" title="لون النص" [value]="templateSettings().hashtags.textColor"
+                  (input)="updateTemplate('hashtags', $any($event.target).value, 'textColor')"
+                  class="w-8 h-8 bg-transparent border-none cursor-pointer">
+                <input type="color" title="لون الخلفية" [value]="templateSettings().hashtags.bgColor"
+                  (input)="updateTemplate('hashtags', $any($event.target).value, 'bgColor')"
+                  class="w-8 h-8 bg-transparent border-none cursor-pointer">
+              </div>
+            </div>
+
+            <div class="flex gap-2 justify-center pt-2">
+              <button (click)="saveSettings()"
+                class="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 rounded-md">حفظ</button>
+              <button (click)="resetSettings()" class="px-3 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded-md">إعادة
+                تعيين</button>
+              @if(showSaveConfirmation()) {
+              <span class="text-xs text-green-400">تم الحفظ!</span>
+              }
+            </div>
+          </div>
+          }
+        </div>
+
+        <button (click)="analyzeImage()" [disabled]="isLoading() || !imagePreview()"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-500 disabled:cursor-not-allowed">
+          @if (isLoading()) {
+          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+          } @else {
+          <span>تحليل وإنشاء</span>
+          }
+        </button>
+
+        @if (error()) {
+        <p class="text-red-400 text-sm mt-2 text-center">{{ error() }}</p>
+        }
+      </div>
+
+      <!-- Right Column: Output -->
+      <div class="bg-gray-900 p-6 rounded-lg min-h-[300px] flex items-center justify-center">
+        @if (isLoading()) {
+        <app-loading-spinner message="...جاري تحليل الصورة" />
+        } @else if (analysisResult(); as result) {
+        <div class="w-full space-y-4 text-sm" [style.font-family]="templateSettings().fontFamily">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <h4 class="font-bold text-blue-400">اسم المنتج</h4>
+              <button (click)="copyToClipboard(result.productName)"
+                class="text-gray-500 hover:text-blue-400 transition-colors" title="نسخ">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3">
+                  </path>
+                </svg>
+              </button>
+            </div>
+            <p class="text-gray-200" [style.color]="templateSettings().productName.color"
+              [style.font-weight]="templateSettings().productName.bold ? 'bold' : 'normal'">{{ result.productName }}</p>
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <h4 class="font-bold text-blue-400">المنشور التسويقي</h4>
+              <button (click)="copyToClipboard(result.marketingPost)"
+                class="text-gray-500 hover:text-blue-400 transition-colors" title="نسخ">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3">
+                  </path>
+                </svg>
+              </button>
+            </div>
+            <p class="text-gray-300 italic" [style.color]="templateSettings().marketingPost.color"
+              [style.font-style]="templateSettings().marketingPost.italic ? 'italic' : 'normal'">"{{
+              result.marketingPost }}"</p>
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <h4 class="font-bold text-blue-400">المميزات</h4>
+              <button (click)="copyToClipboard(result.features.join('\n'))"
+                class="text-gray-500 hover:text-blue-400 transition-colors" title="نسخ">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3">
+                  </path>
+                </svg>
+              </button>
+            </div>
+            <ul class="list-disc list-inside text-gray-300" [style.color]="templateSettings().features.color">
+              @for(feature of result.features; track feature) {
+              <li>{{ feature }}</li>
+              }
+            </ul>
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <h4 class="font-bold text-blue-400">الهاشتاقات</h4>
+              <button (click)="copyToClipboard(result.hashtags.join(' '))"
+                class="text-gray-500 hover:text-blue-400 transition-colors" title="نسخ">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3">
+                  </path>
+                </svg>
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-1">
+              @for(tag of result.hashtags; track tag) {
+              <span class="px-2 py-1 bg-gray-700 text-blue-300 rounded-full text-xs"
+                [style.color]="templateSettings().hashtags.textColor"
+                [style.background-color]="templateSettings().hashtags.bgColor">{{ tag }}</span>
+              }
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <h4 class="font-bold text-blue-400">موجه جديد لإنشاء صورة</h4>
+              <button (click)="copyToClipboard(result.newPrompt)"
+                class="text-gray-500 hover:text-blue-400 transition-colors" title="نسخ">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3">
+                  </path>
+                </svg>
+              </button>
+            </div>
+            <p class="text-gray-400 bg-gray-800 p-2 rounded-md font-mono text-xs">
+              {{ result.newPrompt }}
+            </p>
+          </div>
+        </div>
+        } @else {
+        <div class="text-center text-gray-500">
+          <p>سيظهر المحتوى الذي تم إنشاؤه هنا.</p>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

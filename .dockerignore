@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.local
+Dockerfile
+docker-compose.yml
+nginx.conf
+README.md
+.vscode
+.idea
+npm-debug.log
+yarn-error.log
+.angular
